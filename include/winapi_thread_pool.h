@@ -11,7 +11,7 @@ class thread_pool {
 
     DWORD               m_number_of_threads;
     SRWLOCK             m_lock;
-    CONDITION_VARIABLE  m_condition;
+    HANDLE              m_event_handle;
     HANDLE*             m_threads_handle;
 
     std::queue<std::function<void()>> m_task_queue;
@@ -20,8 +20,21 @@ class thread_pool {
 
     static unsigned int __stdcall start_worker_thread(void *p_this)
     {
-        thread_pool* p_object = static_cast<thread_pool*>(p_this);
-        return p_object->worker_thread();
+        try
+        {
+            thread_pool* p_object = static_cast<thread_pool*>(p_this);
+            p_object->worker_thread();
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "Exception in start_worker_thread(): " << e.what() << '\n';
+        }
+        catch(...)
+        {
+            std::cerr << "Unknown exception in start_worker_thread()" << '\n';
+        }
+        
+        return 0;
     }
 
 
@@ -43,7 +56,7 @@ public:
             m_task_queue.push(wrapped_task);    
         ReleaseSRWLockExclusive(&m_lock);
 
-        WakeConditionVariable(&m_condition);
+        SetEvent(m_event_handle);
 
         return task_ptr->get_future();
     }

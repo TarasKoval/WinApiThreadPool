@@ -2,11 +2,11 @@
 
 #include "winapi_thread_pool.h"
 
-int multiplication(int a, int b) {
+static int multiplication(int a, int b) {
     return a * b;
 }
 
-void addition(int &result, int a, int b) {
+static void addition(int &result, int a, int b) {
     result = a + b;
 	throw std::logic_error("Something horrible happened");
 }
