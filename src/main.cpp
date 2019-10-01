@@ -25,7 +25,7 @@ int main() {
 		addition_result_is_ready.get();
 	} catch (const std::exception &e)
     {
-		std::cout << "From main, I catch exception: " << e.what() << std::endl;
+		std::cout << "From main, I caught exception: " << e.what() << std::endl;
 	}
     std::cout << addition_result << std::endl;
 
