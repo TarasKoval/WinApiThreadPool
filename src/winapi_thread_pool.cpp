@@ -78,9 +78,11 @@ thread_pool::~thread_pool()
 
 unsigned int thread_pool::worker_thread()
 {
-    while (0 == InterlockedExchangeAdd(&m_shutdown, 0)) {
+    while (true) 
+    {
 		AcquireSRWLockExclusive(&m_lock);
-		if (!m_task_queue.empty()) {
+		if (!m_task_queue.empty()) 
+        {
             auto task = m_task_queue.front();
             m_task_queue.pop();
             ReleaseSRWLockExclusive(&m_lock);
@@ -100,9 +102,17 @@ unsigned int thread_pool::worker_thread()
             {
                 std::cerr << "Unknown exception while executing task on the thread pool" << '\n';
             }
-        } else {
+        } 
+        else 
+        {
 			ReleaseSRWLockExclusive(&m_lock);
             WaitForSingleObject(m_event_handle, INFINITE);
+            
+            if (0 != InterlockedExchangeAdd(&m_shutdown, 0))
+            {
+                //shutdown signal was received
+                return 0;
+            }
         }
     }
 
