@@ -23,7 +23,7 @@ int main() {
     try
 	{
 		addition_result_is_ready.get();
-	} catch (const std::exception &e)
+	} catch (const std::logic_error &e)
     {
 		std::cout << "From main, I caught exception: " << e.what() << std::endl;
 	}
